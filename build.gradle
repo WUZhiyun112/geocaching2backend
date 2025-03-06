@@ -1,0 +1,55 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+	   maven {
+        url 'https://maven.aliyun.com/repository/public'
+    }
+}
+
+dependencies {
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	  implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    // Spring Boot Starter Web - 用于创建 REST API
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.2'
+    // Spring Boot Starter Data JPA - 用于与数据库交互
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.1.2'
+    // MySQL Connector - MySQL 驱动
+    implementation 'mysql:mysql-connector-java:8.0.32'
+    // Spring Security Starter - 用于认证和授权
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.1.2'
+    // JSON Web Token (JWT) - 用于生成和解析 JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // Logback - 日志实现库
+    implementation 'org.springframework.boot:spring-boot-starter-logging:3.1.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0' // 检查是否有更新版本号
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.1'
+	// implementation 'io.jsonwebtoken:jjwt:0.11.5'
+
+
+    // 测试依赖
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
