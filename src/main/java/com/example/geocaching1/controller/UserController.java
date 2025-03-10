@@ -29,7 +29,8 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://10.0.2.2:8080")
+@CrossOrigin(origins = "http://192.168.226.72:8080")
+// @CrossOrigin(origins = "http://10.0.2.2:8080")
 public class UserController {
 
     private final UserService userService;

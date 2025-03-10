@@ -42,6 +42,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.0' // 检查是否有更新版本号
     implementation 'jakarta.validation:jakarta.validation-api:3.0.1'
 	// implementation 'io.jsonwebtoken:jjwt:0.11.5'
+     implementation 'mysql:mysql-connector-java:8.0.30'
 
 
     // 测试依赖
