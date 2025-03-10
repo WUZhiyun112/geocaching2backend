@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "geocache")
 public class Geocache {
@@ -41,24 +40,49 @@ public class Geocache {
     @Column(name = "found_at", updatable = false)
     private LocalDateTime foundAt = LocalDateTime.now();
 
-    public Geocache(String code, String name, BigDecimal latitude, BigDecimal longitude, String status, String type, LocalDateTime foundAt) {
+    @Column(name = "difficulty")
+    private String difficulty;
+
+    @NotBlank
+    @Column(name = "code", unique = true)
+    private String code;
+
+    public Geocache(String code, String name, BigDecimal latitude, BigDecimal longitude, String status, String type, LocalDateTime foundAt, String difficulty) {
+        this.code = code;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.status = status;
         this.type = type;
         this.foundAt = foundAt;
-        // 如果你有代码字段，设置它
-        // this.code = code; // 如果需要的话可以添加
+        this.difficulty = difficulty;
     }
 
+    // Getter and setter for difficulty
+    public String getDifficulty() {
+        return difficulty;
+    }
 
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    // Getter and setter for code
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    // Other getters and setters
     public Integer getId() {
         return geocache_id;
     }
 
     public void setId(Integer id) {
-        this.geocache_id = geocache_id;
+        this.geocache_id = id;
     }
 
     public User getUser() {
@@ -117,18 +141,19 @@ public class Geocache {
         this.foundAt = foundAt;
     }
 
-    // toString for easier debugging and logging
     @Override
     public String toString() {
         return "Geocache{" +
                 "id=" + geocache_id +
-                ", user=" + user.getUsername() +  // Assuming User class has a getUsername() method
+                ", user=" + user.getUsername() +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", status='" + status + '\'' +
                 ", foundAt=" + foundAt +
+                ", code='" + code + '\'' +
+                ", difficulty='" + difficulty + '\'' +
                 '}';
     }
 }

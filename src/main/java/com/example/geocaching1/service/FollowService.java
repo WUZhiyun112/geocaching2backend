@@ -1,73 +1,93 @@
 package com.example.geocaching1.service;
 
+import com.example.geocaching1.dto.GeocacheInfoDTO;
 import com.example.geocaching1.entity.Follow;
+import com.example.geocaching1.entity.Geocache;
 import com.example.geocaching1.entity.User;
 import com.example.geocaching1.repository.FollowRepository;
-import com.example.geocaching1.repository.UserRepository; // 需要引入 UserRepository
+import com.example.geocaching1.repository.GeocacheRepository;
+import com.example.geocaching1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class FollowService {
 
-    @Autowired
-    private FollowRepository followRepository;
+    private final FollowRepository followRepository;
+    private final UserRepository userRepository;
+    private final GeocacheRepository geocacheRepository;
 
     @Autowired
-    private UserRepository userRepository;  // 引入 UserRepository 来查找 User 实体
+    public FollowService(FollowRepository followRepository, UserRepository userRepository, GeocacheRepository geocacheRepository) {
+        this.followRepository = followRepository;
+        this.userRepository = userRepository;
+        this.geocacheRepository = geocacheRepository;
+    }
 
     public Follow addFollow(Integer userId, String geocacheCode) {
-        // 根据 userId 查找 User 实体
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            // 如果找不到用户，返回 null 或抛出异常
+            System.out.println("User not found for id: " + userId); // 打印日志
             return null;
         }
 
-        // 检查用户是否已经关注该 geocache
         Optional<Follow> existingFollow = followRepository.findByUserAndGeocacheCode(user.get(), geocacheCode);
         if (existingFollow.isPresent()) {
             return existingFollow.get();
         }
 
-        // 创建新关注记录
         Follow follow = new Follow();
-        follow.setUser(user.get());  // 设置 User 实体
+        follow.setUser(user.get());
         follow.setGeocacheCode(geocacheCode);
-        follow.setIsFollowed(true); // 设置为已关注
+        follow.setIsFollowed(true);
         return followRepository.save(follow);
     }
 
     public Follow removeFollow(Integer userId, String geocacheCode) {
-        // 根据 userId 查找 User 实体
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            // 如果找不到用户，返回 null 或抛出异常
+            System.out.println("User not found for id: " + userId); // 打印日志
             return null;
         }
 
-        // 查找关注记录
         Optional<Follow> follow = followRepository.findByUserAndGeocacheCode(user.get(), geocacheCode);
         if (follow.isPresent()) {
-            follow.get().setIsFollowed(false); // 设置为已取消关注，使用 0
+            follow.get().setIsFollowed(false);
             return followRepository.save(follow.get());
         }
         return null;
     }
 
+    public List<Geocache> getFollowedGeocaches(List<String> geocacheCodes) {
+        List<Geocache> followedGeocaches = new ArrayList<>();
 
-    public List<Follow> getFollowedGeocaches(Integer userId) {
-        // 根据 userId 查找 User 实体
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            // 如果找不到用户，返回空列表或抛出异常
-            return List.of();
+        for (String code : geocacheCodes) {
+            // 调用外部API获取地理缓存详情
+            String response = GeocacheFetcher.fetchGeocacheDetails(code);
+
+            // 检查响应是否为空或存在错误信息
+            if (response != null && !response.isEmpty()) {
+                Geocache geocache = GeocacheFetcher.parseGeocacheDetails(response);
+
+                // 如果解析成功，添加到列表
+                if (geocache != null) {
+                    followedGeocaches.add(geocache);
+                } else {
+                    // 解析失败时的日志
+                    Log.e("GeocacheFetcher", "Failed to parse geocache details for code: " + code);
+                }
+            } else {
+                // API请求失败时的日志
+                Log.e("GeocacheFetcher", "API response is empty or failed for geocache code: " + code);
+            }
         }
 
-        // 查找已关注的 geocache
-        return followRepository.findByUserAndIsFollowedTrue(user.get());
+        // 返回所有获取到的已关注地理缓存
+        return followedGeocaches;
     }
+
 }
