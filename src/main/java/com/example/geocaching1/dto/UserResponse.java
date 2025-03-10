@@ -6,13 +6,16 @@ public class UserResponse {
     private String token;
     private String username;
     private String email;
+    private Integer userId;  // Add userId field
 
-    public UserResponse(boolean success, String message, String token, String username, String email) {
+    // Constructor including userId
+    public UserResponse(boolean success, String message, String token, String username, String email, Integer userId) {
         this.success = success;
         this.message = message;
         this.token = token;
         this.username = username;
         this.email = email;
+        this.userId = userId;  // Initialize userId
     }
 
     // Getters and Setters
@@ -54,5 +57,13 @@ public class UserResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getUserId() {
+        return userId;  // Getter for userId
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;  // Setter for userId
     }
 }

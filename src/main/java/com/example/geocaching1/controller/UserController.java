@@ -89,17 +89,26 @@ public ResponseEntity<UserResponse> loginUser(@RequestBody UserDto userDto) {
     if (!response.isSuccess()) {
         return ResponseEntity.status(401).body(response);
     }
+
+    // 添加 userId 到返回响应
+    Optional<User> userOpt = userRepository.findByUsername(userDto.getUsername());
+    userOpt.ifPresent(user -> response.setUserId(user.getId()));  // 这里设置 userId
+
     return ResponseEntity.ok(response);
 }
+
     @PostMapping("/verify")
     public ResponseEntity<UserResponse> verifyUserCredentials(@RequestBody UserDto userDto) {
         Optional<User> userOpt = userRepository.findByUsernameAndEmail(userDto.getUsername(), userDto.getEmail());
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok(new UserResponse(true, "Credentials valid", null, userDto.getUsername(), userDto.getEmail()));
+            User user = userOpt.get();
+            // 返回带有 userId 的 UserResponse
+            return ResponseEntity.ok(new UserResponse(true, "Credentials valid", null, userDto.getUsername(), userDto.getEmail(), user.getId()));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserResponse(false, "Invalid credentials", null, null, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserResponse(false, "Invalid credentials", null, null, null, null));
         }
     }
+
 
     @GetMapping("/details")
     @PreAuthorize("isAuthenticated()")
@@ -107,22 +116,24 @@ public ResponseEntity<UserResponse> loginUser(@RequestBody UserDto userDto) {
         try {
             String username = tokenService.getUsernameFromToken(token.substring(7)); // Assuming token prefix "Bearer "
             if (username == null) {
-                return ResponseEntity.status(401).body(new UserResponse(false, "Invalid token", null, null, null));
+                return ResponseEntity.status(401).body(new UserResponse(false, "Invalid token", null, null, null, null));
             }
 
             User user = userService.findUserByUsername(username).orElse(null);
             if (user == null) {
-                return ResponseEntity.status(404).body(new UserResponse(false, "User not found", null, null, null));
+                return ResponseEntity.status(404).body(new UserResponse(false, "User not found", null, null, null, null));
             }
 
-            return ResponseEntity.ok(new UserResponse(true, "User details fetched successfully", null, user.getUsername(), user.getEmail()));
+            // 返回带有 userId 的 UserResponse
+            return ResponseEntity.ok(new UserResponse(true, "User details fetched successfully", null, user.getUsername(), user.getEmail(), user.getId()));
         } catch (Exception e) {
             // Log the exception details
             log.error("Error retrieving user details: ", e);
             // Return a generic error response
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new UserResponse(false, "Internal Server Error", null, null, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new UserResponse(false, "Internal Server Error", null, null, null, null));
         }
     }
+
 
 
 

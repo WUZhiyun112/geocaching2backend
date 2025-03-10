@@ -41,7 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/users/verify").permitAll()
-                        .requestMatchers("/api/users/details").permitAll()  // 允许错误页面路径不认证// Allow register/login without authentication
+                        .requestMatchers("/api/users/details").permitAll()
+                        .requestMatchers("/api/follow/remove", "/api/follow/add").permitAll() // 允许错误页面路径不认证// Allow register/login without authentication
                         .anyRequest().authenticated()  // Requires authentication for other requests
                 )
                 .sessionManagement(session -> session

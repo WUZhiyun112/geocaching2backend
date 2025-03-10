@@ -68,4 +68,8 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    public Integer getUserId() {
+        return this.user_id;
+    }
+
 }

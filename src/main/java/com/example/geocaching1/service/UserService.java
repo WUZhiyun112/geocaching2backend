@@ -82,15 +82,15 @@ public class UserService {
     public UserResponse authenticateUser(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (!userOpt.isPresent()) {
-            return new UserResponse(false, "Username does not exist", null, null, null);
+            return new UserResponse(false, "Username does not exist", null, null, null, null);
         }
         User user = userOpt.get();
         boolean passwordMatches = passwordEncoder.matches(password, user.getPasswordHash());
         if (!passwordMatches) {
-            return new UserResponse(false, "Invalid credentials", null, null, null);
+            return new UserResponse(false, "Invalid credentials", null, null, null, null);
         }
         String token = tokenService.generateToken(user.getUsername());
-        return new UserResponse(true, "Login successful.", token, user.getUsername(), user.getEmail());
+        return new UserResponse(true, "Login successful.", token, user.getUsername(), user.getEmail(), user.getUserId());
     }
 
 
@@ -100,10 +100,10 @@ public class UserService {
             Optional<User> userOpt = userRepository.findByUsername(username);
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
-                return new UserResponse(true, "User details fetched successfully.", null, user.getUsername(), user.getEmail());
+                return new UserResponse(true, "User details fetched successfully.", null, user.getUsername(), user.getEmail(), user.getUserId());
             }
         }
-        return new UserResponse(false, "User not found", null, null, null);
+        return new UserResponse(false, "User not found", null, null, null,null);
     }
 }
 
