@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 @Entity
 public class Follow {
 
@@ -19,19 +18,47 @@ public class Follow {
     private User user; // 关联用户表
 
     private String geocacheCode;  // 外部数据源的 geocache 唯一标识符
+    private String geocacheName;  // Geocache 名称
+    private String geocacheType;  // Geocache 类型
+    private String location;      // Geocache 位置
 
     private boolean isFollowed = true;  // 默认值为 true，表示关注
 
-    // 修改为 Integer 类型
+    // Modify getters and setters for the new fields
+    public String getGeocacheName() {
+        return geocacheName;
+    }
+
+    public void setGeocacheName(String geocacheName) {
+        this.geocacheName = geocacheName;
+    }
+
+    public String getGeocacheType() {
+        return geocacheType;
+    }
+
+    public void setGeocacheType(String geocacheType) {
+        this.geocacheType = geocacheType;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    // Existing methods
     public Integer getUserId() {
-        return user != null ? user.getId() : null;  // 返回与 User 对应的 user_id
+        return user != null ? user.getId() : null;
     }
 
     public void setUserId(Integer id) {
         if (this.user == null) {
-            this.user = new User();  // 创建一个新的 User 实例
+            this.user = new User();
         }
-        this.user.setId(id);  // 将传入的 id 设置为 User 对象的 user_id
+        this.user.setId(id);
     }
 
     public User getUser() {
