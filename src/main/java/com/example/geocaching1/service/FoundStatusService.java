@@ -20,7 +20,10 @@ public class FoundStatusService {
     @Autowired
     private UserRepository userRepository;
 
-    public FoundStatus setFoundStatus(Integer userId, String geocacheCode, String geocacheName, String geocacheType, String location, String myStatus) {
+    public FoundStatus setFoundStatus(Integer userId, String geocacheCode, String geocacheName,
+                                      String geocacheType, String location, String myStatus,
+                                      LocalDateTime foundAt) {
+
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             return null;
@@ -36,11 +39,16 @@ public class FoundStatusService {
         // Set the status
         foundStatus.setStatus(myStatus);
 
-        // Calculate foundAt based on the status
-        foundStatus.setFoundAt(myStatus.equals("Found") ? LocalDateTime.now() : null);
+        // If no foundAt was passed, set it based on the status
+        if (foundAt == null && myStatus.equals("Found it")) {
+            foundStatus.setFoundAt(LocalDateTime.now());
+        } else {
+            foundStatus.setFoundAt(foundAt);  // Use the passed value
+        }
 
         return foundStatusRepository.save(foundStatus);
     }
+
 
     public List<FoundStatus> getUserFoundGeocaches(Integer userId) {
         return foundStatusRepository.findByUserId(userId);

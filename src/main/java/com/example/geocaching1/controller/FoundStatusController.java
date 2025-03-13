@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.time.LocalDateTime;
 @RestController
@@ -25,38 +27,38 @@ public class FoundStatusController {
             @RequestParam String geocacheName,
             @RequestParam String geocacheType,
             @RequestParam String location,
-            @RequestParam String myStatus) {
+            @RequestParam String myStatus,
+            @RequestParam(required = false) String foundAt) {  // Allow foundAt to be passed
 
         System.out.println("Received userId: " + userId);
         System.out.println("Received geocacheCode: " + geocacheCode);
         System.out.println("Received geocacheName: " + geocacheName);
         System.out.println("Received geocacheType: " + geocacheType);
         System.out.println("Received location: " + location);
-        System.out.println("Received myStatus: '" + myStatus + "'");  // 加单引号检查空格或换行
+        System.out.println("Received myStatus: '" + myStatus + "'");
+        System.out.println("Received foundAt: " + foundAt);  // Print foundAt
 
         if (userId == null || geocacheCode == null || geocacheCode.isEmpty() || geocacheName == null ||
                 geocacheType == null || location == null || myStatus == null) {
-            System.out.println("Validation failed: Some parameters are null or empty.");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        // 打印参数
-        System.out.println("Received parameters: userId=" + userId + ", geocacheCode=" + geocacheCode +
-                ", geocacheName=" + geocacheName + ", geocacheType=" + geocacheType +
-                ", location=" + location + ", myStatus=" + myStatus);
-
-        // 空值检查
-        if (userId == null || geocacheCode == null || geocacheCode.isEmpty() || geocacheName == null ||
-                geocacheType == null || location == null || myStatus == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // 只允许三种状态
-        if (!myStatus.equals("Not Found") && !myStatus.equals("Found") && !myStatus.equals("Found Fail")) {
+        if (!myStatus.equals("Haven’t started") && !myStatus.equals("Found it") && !myStatus.equals("Searched but not found")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // 调用 service 层方法保存找到状态
-        FoundStatus foundStatus = foundStatusService.setFoundStatus(userId, geocacheCode, geocacheName, geocacheType, location, myStatus);
+        // Parse foundAt if it's passed
+        LocalDateTime foundAtTime = null;
+        if (foundAt != null && !foundAt.isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                foundAtTime = LocalDateTime.parse(foundAt, formatter);
+            } catch (DateTimeParseException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        FoundStatus foundStatus = foundStatusService.setFoundStatus(userId, geocacheCode, geocacheName, geocacheType, location, myStatus, foundAtTime);
 
         return new ResponseEntity<>(foundStatus, HttpStatus.CREATED);
     }
